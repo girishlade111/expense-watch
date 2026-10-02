@@ -1,73 +1,98 @@
-# Welcome to your Lovable project
+# Expense Watch
 
-## Project info
+A read-only expense tracking dashboard that visualizes transactions stored in a Google Sheet — no backend, no database, no login required. Open the app, and it pulls the latest rows from a public Google Sheet and turns them into summary cards, charts, and a searchable transaction table.
 
-**URL**: https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID
+## Features
 
-## How can I edit this code?
+- **Google Sheets as the data source** — transactions are read live from a Google Sheet (`Sheet1!A2:F`: Date & Time, Credit, Debit, Category, Amount, Purpose/Notes). Update the sheet and the dashboard refreshes instantly.
+- **Summary cards** — total credit, total debit, and net balance computed from the sheet rows.
+- **Spending charts** — category breakdown and trend visualizations built with Recharts.
+- **Transaction table** — full history with date, type (credit/debit), category, amount, and notes.
+- **Filters** — toggle between all / credit / debit transactions; amounts parse ₹-formatted values.
+- **Dark/light mode** — theme toggle powered by next-themes.
+- **Responsive UI** — shadcn/ui components with Tailwind CSS, works on mobile and desktop.
 
-There are several ways of editing your application.
+## Tech Stack
 
-**Use Lovable**
+- React 18 + TypeScript
+- Vite 5 (build tooling)
+- Tailwind CSS + shadcn/ui (Radix primitives)
+- React Router (client-side routing)
+- TanStack React Query
+- Recharts (charts), date-fns, lucide-react icons
+- Google Sheets API v4 (read-only data source)
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID) and start prompting.
-
-Changes made via Lovable will be committed automatically to this repo.
-
-**Use your preferred IDE**
-
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
-
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
-
-Follow these steps:
+## Quick Start
 
 ```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
+# Install dependencies
+npm install
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
-
-# Step 3: Install the necessary dependencies.
-npm i
-
-# Step 4: Start the development server with auto-reloading and an instant preview.
+# Start the dev server
 npm run dev
 ```
 
-**Edit a file directly in GitHub**
+Open http://localhost:8080 (the dev server runs on port 8080).
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+## Configuration — Point It at Your Own Sheet
 
-**Use GitHub Codespaces**
+The dashboard reads from a hardcoded Google Sheet in `src/pages/Index.tsx`:
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+```ts
+const SPREADSHEET_ID = "1Armz9c9Tr1mXeGWymyhgUOhhw0cA_QvyTAcc2Q6uA9w";
+const RANGE = "Sheet1!A2:F"; // Date & Time, Credit, Debit, Category, Amount, Purpose/Notes
+```
 
-## What technologies are used for this project?
+To use your own data:
 
-This project is built with:
+1. Create a Google Sheet with columns: Date & Time | Credit | Debit | Category | Amount | Purpose/Notes.
+2. Share it as "Anyone with the link can view".
+3. Create a Google Cloud API key with the Sheets API enabled.
+4. Replace `SPREADSHEET_ID`, `RANGE`, and `API_KEY` in `src/pages/Index.tsx`.
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+> **Security note:** the API key is bundled into the client-side JavaScript. Restrict it in the Google Cloud console to your sheet's API + HTTP referrer allowlist.
 
-## How can I deploy this project?
+## Project Structure
 
-Simply open [Lovable](https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID) and click on Share -> Publish.
+```
+expense-watch/
+├── index.html            # HTML entry (title, meta tags)
+├── vite.config.ts        # Vite config (@ alias -> src, port 8080)
+├── src/
+│   ├── main.tsx          # React entry point
+│   ├── App.tsx           # Router + providers (theme, query client, toasts)
+│   ├── index.css         # Tailwind + theme tokens
+│   ├── pages/
+│   │   ├── Index.tsx     # Expense dashboard (fetches Google Sheet)
+│   │   └── NotFound.tsx  # 404 page
+│   ├── components/
+│   │   ├── NavLink.tsx
+│   │   └── ui/           # shadcn/ui primitives (button, card, table, dialog, …)
+│   ├── hooks/            # shared React hooks
+│   └── lib/              # utils (cn, etc.)
+├── public/               # static assets
+└── package.json
+```
 
-## Can I connect a custom domain to my Lovable project?
+## Build & Deploy
 
-Yes, you can!
+```sh
+npm run build   # outputs static files to dist/
+npm run preview # preview the production build locally
+```
 
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
+The output of `dist/` is fully static and can be hosted on GitHub Pages, Netlify, or Cloudflare Pages. This repo is deployed via GitHub Pages from the `main` branch.
 
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/features/custom-domain#custom-domain)
+## Scripts
+
+| Script        | Description                          |
+|---------------|--------------------------------------|
+| `npm run dev` | Start the Vite dev server (port 8080)|
+| `npm run build` | Production build to `dist/`        |
+| `npm run build:dev` | Development-mode build          |
+| `npm run preview` | Preview the production build     |
+| `npm run lint` | Run ESLint                         |
+
+---
+
+Built by **Girish Lade** — https://ladestack.in
